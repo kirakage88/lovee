@@ -1,14 +1,15 @@
 (function(){
 var SRC="photos/puzzle.jpg";
-var fb="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><defs><pattern id="g" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#fff"/><rect width="30" height="60" fill="#2f7df6" opacity=".25"/><rect width="60" height="30" fill="#2f7df6" opacity=".25"/></pattern></defs><rect width="300" height="300" fill="url(#g)"/><g transform="translate(30 20) scale(2.4)"><path fill="#ff4f8b" d="M50 88C20 62 2 44 2 26 2 12 13 2 27 2c10 0 19 6 23 14C54 8 63 2 73 2c14 0 25 10 25 24 0 18-18 36-48 62z"/></g><g font-family="Georgia,serif" font-weight="700" fill="#fff" text-anchor="middle"><text x="150" y="112" font-size="40">Pax</text><text x="150" y="146" font-size="26" font-style="italic">&amp;</text><text x="150" y="188" font-size="40">Bea</text></g></svg>');
+var fb="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><defs><pattern id="g" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#fffaf0"/><rect width="30" height="60" fill="#315fa8" opacity=".2"/><rect width="60" height="30" fill="#315fa8" opacity=".2"/></pattern></defs><rect width="300" height="300" fill="url(#g)"/><g transform="translate(30 20) scale(2.4)"><path fill="#e65b7c" d="M50 88C20 62 2 44 2 26 2 12 13 2 27 2c10 0 19 6 23 14C54 8 63 2 73 2c14 0 25 10 25 24 0 18-18 36-48 62z"/></g><g font-family="Georgia,serif" font-weight="700" fill="#fff" text-anchor="middle"><text x="150" y="112" font-size="40">Pax</text><text x="150" y="146" font-size="26" font-style="italic">&amp;</text><text x="150" y="188" font-size="40">Bea</text></g></svg>');
 var stage=document.getElementById("stage"),msg=document.getElementById("pmsg"),skip=document.getElementById("skip"),letter=document.getElementById("letter");
+var reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var placed=0,z=10;
-function show(){letter.classList.remove("locked");letter.classList.add("reveal");skip.hidden=true;letter.scrollIntoView({behavior:"smooth",block:"start"})}
+function show(){letter.classList.remove("locked");letter.classList.add("reveal");skip.hidden=true;letter.scrollIntoView({behavior:reduceMotion?"auto":"smooth",block:"start"})}
 skip.onclick=function(){msg.textContent="no pressure, here it is 💙";show()};
 function prep(src,cb){var im=new Image();im.onload=function(){try{var c=document.createElement("canvas"),m=Math.min(im.width,im.height);c.width=c.height=800;c.getContext("2d").drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,800,800);cb(c.toDataURL("image/jpeg",.9))}catch(e){cb(src)}};im.onerror=function(){if(src!==fb)prep(fb,cb)};im.src=src}
 function build(url){
-  var W=stage.clientWidth,s=Math.min(118,Math.floor(W/3.5)),p=Math.round(s*.3),B=s*3,ox=Math.round((W-B)/2),oy=p,bs=s+2*p;
-  stage.style.height=(B+2*p+s*2.2)+"px";
+  var W=stage.clientWidth,s=Math.min(118,Math.floor(W/3.5)),p=Math.round(s*.3),B=s*3,ox=Math.round((W-B)/2),oy=p,bs=s+2*p,tray=Math.round(s*1.3);
+  stage.style.height=(oy+B+tray+bs)+"px";
   var g=document.createElement("div");g.className="ghost";
   g.style.cssText="left:"+ox+"px;top:"+oy+"px;width:"+B+"px;height:"+B+"px;background:linear-gradient(rgba(255,255,255,.8),rgba(255,255,255,.8)),url("+url+") 0 0/100% 100%";
   stage.appendChild(g);
@@ -34,7 +35,7 @@ function build(url){
     pi.style.background="url("+url+") "+(p-c*s)+"px "+(p-r*s)+"px/"+B+"px "+B+"px";
     el.appendChild(pi);
     var tx=ox+c*s-p,ty=oy+r*s-p;
-    el.style.cssText="width:"+bs+"px;height:"+bs+"px;left:"+Math.random()*(W-bs)+"px;top:"+(oy+B+Math.random()*(s*2.2-p))+"px";
+    el.style.cssText="width:"+bs+"px;height:"+bs+"px;left:"+Math.random()*(W-bs)+"px;top:"+(oy+B+Math.random()*tray)+"px";
     var dx=0,dy=0;
     el.onpointerdown=function(e){el.setPointerCapture(e.pointerId);dx=e.clientX-el.offsetLeft;dy=e.clientY-el.offsetTop;el.style.zIndex=++z;el.classList.add("up");e.preventDefault()};
     el.onpointermove=function(e){if(el.hasPointerCapture(e.pointerId)){el.style.left=(e.clientX-dx)+"px";el.style.top=(e.clientY-dy)+"px"}};
